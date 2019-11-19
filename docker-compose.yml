@@ -1,0 +1,7 @@
+version: '3'
+services:
+    rdap-api:
+      image: rdap-api
+      ports:
+        - "80:80"
+      command: ./main
