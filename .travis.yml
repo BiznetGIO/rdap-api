@@ -2,6 +2,7 @@ services:
   - docker
 
 script:
+  - docker build -t rdap-api .
   - docker-compose up -d
   - docker-compose ps
   - curl http://localhost:80
