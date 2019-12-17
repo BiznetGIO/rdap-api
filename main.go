@@ -14,11 +14,12 @@ func main() {
 }
 
 func handle(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
+/*
+  if r.Method != "GET" {
 		http.Error(w, "Method not supported", 501)
 		return
 	}
-
+*/
 	w.Header().Add("Access-Control-Allow-Origin", "*")
 
 	s := http.NewServeMux()
