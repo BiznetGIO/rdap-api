@@ -6,6 +6,8 @@ import (
 	"os"
 	"strings"
 	"github.com/openrdap/rdap/bootstrap"
+	"log"
+	"io/ioutil"
 )
 
 func main() {
@@ -127,5 +129,22 @@ func processBootstrappedQuery(w http.ResponseWriter, r *http.Request, regType bo
 	u.Path += r.URL.Path
 	u.RawQuery = r.URL.RawQuery
 	// Redirect...
-	http.Redirect(w, r, u.String(), 302)
+	//http.Redirect(w, r, u.String(), 302)
+	resp, err := http.Get(u.String())
+    if err != nil {
+        log.Fatal(err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusOK {
+		bodyBytes, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+		bodyString := string(bodyBytes)
+		w.Header().Set("Content-Type", "application/rdap+json")
+		fmt.Fprintf(w, "%s", bodyString)
+	} else {
+		w.WriteHeader(resp.StatusCode)
+	}
 }
