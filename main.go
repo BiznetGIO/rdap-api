@@ -150,7 +150,7 @@ func processBootstrappedQuery(w http.ResponseWriter, r *http.Request, regType bo
 
 		if handleCode != "3773" {
 			w.Header().Set("Content-Type", "application/json;charset=UTF-8")
-			w.WriteHeader(resp.StatusCode)
+			w.WriteHeader(http.StatusNotFound)
 			notFoundMsg := `{"errorCode":404,"title":"Not Found","description":"Domain not found"}`
 			fmt.Fprintf(w, "%s", notFoundMsg)
 		} else {
