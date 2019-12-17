@@ -8,6 +8,7 @@ import (
 	"github.com/openrdap/rdap/bootstrap"
 	"log"
 	"io/ioutil"
+	"encoding/json"
 )
 
 func main() {
@@ -141,10 +142,28 @@ func processBootstrappedQuery(w http.ResponseWriter, r *http.Request, regType bo
 		if err != nil {
 			log.Fatal(err)
 		}
-		bodyString := string(bodyBytes)
-		w.Header().Set("Content-Type", "application/rdap+json")
-		fmt.Fprintf(w, "%s", bodyString)
-	} else {
+
+		var entities map[string]interface{}
+		json.Unmarshal(bodyBytes, &entities)
+		handleCode := entities["entities"].([]interface{})[0].(map[string]interface{})["handle"]
+		fmt.Println("handle code : ",handleCode)
+
+		if handleCode != "3773" {
+			w.Header().Set("Content-Type", "application/json;charset=UTF-8")
+			w.WriteHeader(resp.StatusCode)
+			notFoundMsg := `{"errorCode":404,"title":"Not Found","description":"Domain not found"}`
+			fmt.Fprintf(w, "%s", notFoundMsg)
+		} else {
+			bodyString := string(bodyBytes)
+			w.Header().Set("Content-Type", "application/rdap+json")
+			fmt.Fprintf(w, "%s", bodyString)
+		}
+	} else if resp.StatusCode == http.StatusNotFound {
+		w.Header().Set("Content-Type", "application/json;charset=UTF-8")
+		w.WriteHeader(resp.StatusCode)
+		notFoundMsg := `{"errorCode":404,"title":"Not Found","description":"Domain not found"}`
+		fmt.Fprintf(w, "%s", notFoundMsg)
+	}else {
 		w.WriteHeader(resp.StatusCode)
 	}
 }
